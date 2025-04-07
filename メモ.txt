@@ -1,0 +1,10 @@
+﻿■ 1. ビルド方法
+vs2022\SumatraPDF.sln
+
+Release - x64
+
+ビルド中に lib ファイルのインポートで失敗することがあるが、何度かビルドするとなぜか治る。
+
+■ 2. 結果ファイル
+out\rel64\SumatraPDF.exe
+

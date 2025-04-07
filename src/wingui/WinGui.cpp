@@ -3451,7 +3451,8 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
     Theme* theme = gCurrentTheme;
     SolidBrush br(GdipCol(theme->window.controlBackgroundColor));
 
-    Font f(hdc, GetDefaultGuiFont());
+    //Font f(hdc, GetDefaultGuiFont());
+    Font f(&fontFamily, 9, Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
 
     Gdiplus::Rect gr = ToGdipRect(rc);
     gfx.FillRectangle(&br, gr);
@@ -3573,6 +3574,11 @@ HBITMAP TabsCtrl::RenderForDragging(int idx) {
 
 TabsCtrl::TabsCtrl() {
     kind = kindTabs;
+
+    Status ret1 = pfc.AddFontFile(L"c:\\windows\\fonts\\YuGothB.ttc");
+
+    INT numFound = 0;
+    Status ret2 = pfc.GetFamilies(1, &fontFamily, &numFound);
 }
 
 TabsCtrl::~TabsCtrl() {
