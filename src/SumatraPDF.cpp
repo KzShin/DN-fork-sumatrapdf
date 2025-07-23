@@ -802,24 +802,33 @@ void ControllerCallbackHandler::UpdateScrollbars(Size canvas) {
     ShowScrollBar(win->hwndCanvas, SB_HORZ, viewPort.dx < canvas.dx);
     SetScrollInfo(win->hwndCanvas, SB_HORZ, &si, TRUE);
 
-    if (viewPort.dy >= canvas.dy) {
-        si.nPos = 0;
-        si.nMin = 0;
-        si.nMax = 99;
-        si.nPage = 100;
-    } else {
-        si.nPos = dm->GetViewPort().y;
-        si.nMin = 0;
-        si.nMax = canvas.dy - 1;
-        si.nPage = viewPort.dy;
+    bool continuous = IsContinuous(dm->GetDisplayMode());
+    if (continuous) {
+        if (viewPort.dy >= canvas.dy) {
+            si.nPos = 0;
+            si.nMin = 0;
+            si.nMax = 99;
+            si.nPage = 100;
+        } else {
+            si.nPos = dm->GetViewPort().y;
+            si.nMin = 0;
+            si.nMax = canvas.dy - 1;
+            si.nPage = viewPort.dy;
 
-        if (kZoomFitPage != dm->GetZoomVirtual()) {
-            // keep the top/bottom 5% of the previous page visible after paging down/up
-            si.nPage = (uint)(si.nPage * 0.95);
-            si.nMax -= viewPort.dy - si.nPage;
+            if (kZoomFitPage != dm->GetZoomVirtual()) {
+                // keep the top/bottom 5% of the previous page visible after paging down/up
+                si.nPage = (uint)(si.nPage * 0.95);
+                si.nMax -= viewPort.dy - si.nPage;
+            }
         }
+        ShowScrollBar(win->hwndCanvas, SB_VERT, viewPort.dy < canvas.dy);
+    } else {
+        si.nPos = dm->CurrentPageNo() - 1;
+        si.nMin = 0;
+        si.nMax = dm->PageCount() - 1;
+        si.nPage = 1;
+        ShowScrollBar(win->hwndCanvas, SB_VERT, TRUE);
     }
-    ShowScrollBar(win->hwndCanvas, SB_VERT, viewPort.dy < canvas.dy);
     SetScrollInfo(win->hwndCanvas, SB_VERT, &si, TRUE);
 }
 

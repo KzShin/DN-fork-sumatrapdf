@@ -96,13 +96,49 @@ static void OnVScroll(MainWindow* win, WPARAM wp) {
 
     int currPos = si.nPos;
     auto ctrl = win->ctrl;
+    bool continuous = IsContinuous(ctrl->GetDisplayMode());
     int lineHeight = DpiScale(win->hwndCanvas, 16);
     bool isFitPage = (kZoomFitPage == ctrl->GetZoomVirtual());
-    if (!IsContinuous(ctrl->GetDisplayMode()) && isFitPage) {
+    if (!continuous && isFitPage) {
         lineHeight = 1;
     }
 
     USHORT msg = LOWORD(wp);
+    if (!continuous) {
+        // treat the scrollbar position as page number
+        int pos = ctrl->CurrentPageNo() - 1;
+        switch (msg) {
+            case SB_TOP:
+                pos = 0;
+                break;
+            case SB_BOTTOM:
+                pos = ctrl->PageCount() - 1;
+                break;
+            case SB_LINEUP:
+            case SB_PAGEUP:
+                pos -= 1;
+                break;
+            case SB_LINEDOWN:
+            case SB_PAGEDOWN:
+                pos += 1;
+                break;
+            case SB_THUMBTRACK:
+                pos = si.nTrackPos;
+                break;
+        }
+        si.nMin = 0;
+        si.nMax = ctrl->PageCount() - 1;
+        si.nPage = 1;
+        pos = limitValue(pos, si.nMin, si.nMax);
+        si.nPos = pos;
+        si.fMask = SIF_POS;
+        SetScrollInfo(win->hwndCanvas, SB_VERT, &si, TRUE);
+        if (pos != currPos || msg == SB_THUMBTRACK) {
+            ctrl->GoToPage(pos + 1);
+        }
+        return;
+    }
+
     switch (msg) {
         case SB_TOP:
             si.nPos = si.nMin;
@@ -132,6 +168,8 @@ static void OnVScroll(MainWindow* win, WPARAM wp) {
             si.nPos = si.nTrackPos;
             break;
     }
+
+
 
     // Set the position and then retrieve it.  Due to adjustments
     // by Windows it may not be the same as the value set.
@@ -1541,6 +1579,9 @@ static LRESULT WndProcCanvasFixedPageUI(MainWindow* win, HWND hwnd, UINT msg, WP
 
             if (requiredScrollAxes != -1) {
                 ShowScrollBar(win->hwndCanvas, requiredScrollAxes, !gGlobalPrefs->fixedPageUI.hideScrollbars);
+            } else if (!IsContinuous(win->ctrl->GetDisplayMode()) && !gGlobalPrefs->fixedPageUI.hideScrollbars) {
+                // ensure scrollbar visibility in non-continuous modes
+                ShowScrollBar(win->hwndCanvas, SB_VERT, TRUE);
             }
 
             // allow default processing to continue
