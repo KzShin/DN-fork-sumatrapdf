@@ -1261,6 +1261,20 @@ static LRESULT CanvasOnMouseWheel(MainWindow* win, UINT msg, WPARAM wp, LPARAM l
         }
     }
 
+    bool continuous = IsContinuous(win->ctrl->GetDisplayMode());
+    if (!horizontal && !continuous) {
+        win->wheelAccumDelta += delta;
+        while (win->wheelAccumDelta >= WHEEL_DELTA) {
+            win->ctrl->GoToPrevPage(true);
+            win->wheelAccumDelta -= WHEEL_DELTA;
+        }
+        while (win->wheelAccumDelta <= -WHEEL_DELTA) {
+            win->ctrl->GoToNextPage();
+            win->wheelAccumDelta += WHEEL_DELTA;
+        }
+        return 0;
+    }
+
     win->wheelAccumDelta += delta;
     int currentScrollPos = GetScrollPos(win->hwndCanvas, SB_VERT);
 
