@@ -134,7 +134,7 @@ static void OnVScroll(MainWindow* win, WPARAM wp) {
         si.fMask = SIF_POS;
         SetScrollInfo(win->hwndCanvas, SB_VERT, &si, TRUE);
         if (pos != currPos || msg == SB_THUMBTRACK) {
-            ctrl->GoToPage(pos + 1);
+            ctrl->GoToPage(pos + 1, true);
         }
         return;
     }
