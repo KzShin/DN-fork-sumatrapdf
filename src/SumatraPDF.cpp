@@ -1056,14 +1056,14 @@ static DisplayMode GetDirDefaultDisplayMode(const char* filePath) {
                     if (next) {
                         *next = 0;
                     }
-                    str::TrimWSInPlace(line, TrimOpt::Both);
+                    str::TrimWSInPlace(line, str::TrimOpt::Both);
                     if (*line && *line != '#' && *line != ';') {
                         char* eq = str::FindChar(line, '=');
                         if (eq) {
                             *eq = 0;
-                            str::TrimWSInPlace(line, TrimOpt::Right);
+                            str::TrimWSInPlace(line, str::TrimOpt::Right);
                             char* val = eq + 1;
-                            str::TrimWSInPlace(val, TrimOpt::Both);
+                            str::TrimWSInPlace(val, str::TrimOpt::Both);
                             if (str::EqIS(line, "DirDefaultDisplayMode")) {
                                 DisplayMode m = DisplayModeFromString(val, DisplayMode::Automatic);
                                 if (m != DisplayMode::Automatic) {
