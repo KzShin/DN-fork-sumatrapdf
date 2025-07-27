@@ -3637,6 +3637,17 @@ static void TriggerTabDragged(TabsCtrl* tabs, int tab1, int tab2) {
     tabs->onTabDragged(&ev);
 }
 
+static void TriggerTabDblClick(TabsCtrl* tabs, int tabIdx, bool shiftPressed) {
+    if (!tabs->onTabDblClick) {
+        return;
+    }
+    TabDblClickEvent ev;
+    ev.tabs = tabs;
+    ev.tabIdx = tabIdx;
+    ev.shiftPressed = shiftPressed;
+    tabs->onTabDblClick(&ev);
+}
+
 static void UpdateAfterDrag(TabsCtrl* tabsCtrl, int tab1, int tab2) {
     int nTabs = tabsCtrl->TabCount();
     bool badState = (tab1 == tab2) || (tab1 < 0) || (tab2 < 0) || (tab1 >= nTabs) || (tab2 >= nTabs);
@@ -3886,6 +3897,15 @@ LRESULT TabsCtrl::WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     Point scPoint(p.x, p.y);
                     TriggerTabMigration(this, selectedTab, scPoint);
                 }
+            }
+            return 0;
+        }
+
+        case WM_LBUTTONDBLCLK: {
+            nWmMouseMoveCount = 0;
+            if (tabUnderMouse != -1 && !overClose) {
+                bool shift = IsShiftPressed();
+                TriggerTabDblClick(this, tabUnderMouse, shift);
             }
             return 0;
         }

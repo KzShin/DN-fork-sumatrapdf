@@ -204,6 +204,10 @@ static MenuDef menuDefContextTab[] = {
         CmdDuplicateInNewWindow,
     },
     {
+        _TRN("Open In New Tab"),
+        CmdDuplicateInNewTab,
+    },
+    {
         kMenuSeparator,
         0,
     },
@@ -322,6 +326,10 @@ static void TabsContextMenu(ContextMenuEvent* ev) {
             DuplicateTabInNewWindow(tabUnderMouse);
             break;
         }
+        case CmdDuplicateInNewTab: {
+            DuplicateTabInNewTab(tabUnderMouse);
+            break;
+        }
         case CmdProperties: {
             bool extended = false;
             ShowProperties(win->hwndFrame, tabUnderMouse->ctrl, extended);
@@ -367,6 +375,15 @@ void CreateTabbar(MainWindow* win) {
             releaseWnd = nullptr;
         }
         MigrateTab(tab, releaseWnd);
+    };
+
+    tabsCtrl->onTabDblClick = [win](TabDblClickEvent* ev) {
+        WindowTab* tab = win->GetTab(ev->tabIdx);
+        if (ev->shiftPressed) {
+            DuplicateTabInNewWindow(tab);
+        } else {
+            DuplicateTabInNewTab(tab);
+        }
     };
 
     TabsCreateArgs args;
