@@ -36,6 +36,7 @@
 #include "Annotation.h"
 #include "PdfCreator.h"
 #include "GlobalPrefs.h"
+#include "utils/SettingsUtil.h"
 #include "ChmModel.h"
 #include "PalmDbReader.h"
 #include "EbookBase.h"
@@ -3117,6 +3118,19 @@ static UINT_PTR CALLBACK FileOpenHook(HWND hDlg, UINT uiMsg, WPARAM wp, LPARAM l
 }
 #endif
 
+static TabState* CopyTabState(WindowTab* tab) {
+    if (!tab || !tab->ctrl) {
+        return nullptr;
+    }
+    FileState* fs = NewDisplayState(tab->filePath);
+    tab->ctrl->GetDisplayState(fs);
+    fs->showToc = tab->showToc;
+    *fs->tocState = tab->tocState;
+    TabState* ts = NewTabState(fs);
+    DeleteDisplayState(fs);
+    return ts;
+}
+
 void DuplicateTabInNewWindow(WindowTab* tab) {
     if (!tab || tab->IsAboutTab()) {
         return;
@@ -3126,16 +3140,29 @@ void DuplicateTabInNewWindow(WindowTab* tab) {
     if (!path) {
         return;
     }
+
+    TabState* ts = CopyTabState(tab);
+
     MainWindow* newWin = CreateAndShowMainWindow(nullptr);
     if (!newWin) {
+        if (ts) {
+            //FreeStruct(&gTabStateInfo, ts);
+        }
         return;
     }
 
-    // TODO: should copy the display state from current file
     LoadArgs args(path, newWin);
     args.showWin = true;
     args.noPlaceWindow = true;
     LoadDocument(&args, false, false);
+
+    if (ts) {
+        WindowTab* newTab = newWin->CurrentTab();
+        if (newTab) {
+            SetTabState(newTab, ts);
+        }
+        //FreeStruct(&gTabStateInfo, ts);
+    }
 }
 
 void DuplicateTabInNewTab(WindowTab* tab) {
