@@ -880,6 +880,7 @@ void ControllerCallbackHandler::PageNoChanged(DocController* ctrl, int pageNo) {
         if (win->ctrl->HasPageLabels()) {
             UpdateToolbarPageText(win, win->ctrl->PageCount(), true);
         }
+        HwndScheduleRepaint(win->tabsCtrl->hwnd);
     }
     if (pageNo == win->currPageNo) {
         return;

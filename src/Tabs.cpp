@@ -494,6 +494,7 @@ void TabsOnChangedDoc(MainWindow* win) {
     CrashIf(win->GetTabIdx(tab) != win->tabsCtrl->GetSelected());
     VerifyWindowTab(win, tab);
     UpdateTabTitle(tab);
+    HwndScheduleRepaint(win->tabsCtrl->hwnd);
 }
 
 // Called when we're closing an entire window (quitting)
