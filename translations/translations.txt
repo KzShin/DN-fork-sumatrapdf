@@ -21734,3 +21734,4 @@ uk:друк документа
 uz:hujjatni chop etish
 vn:đang in tập tin
 :Open In New Tab
+::Copy As Image
