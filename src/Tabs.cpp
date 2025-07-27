@@ -212,6 +212,14 @@ static MenuDef menuDefContextTab[] = {
         0,
     },
     {
+        _TRN("Copy As Image"),
+        CmdCopyPageImage,
+    },
+    {
+        kMenuSeparator,
+        0,
+    },
+    {
         _TRN("Close"),
         CmdClose,
     },
@@ -320,6 +328,10 @@ static void TabsContextMenu(ContextMenuEvent* ev) {
         }
         case CmdCopyFilePath: {
             CopyFilePath(tabUnderMouse);
+            break;
+        }
+        case CmdCopyPageImage: {
+            CopyCurrentPageAsImage(win);
             break;
         }
         case CmdDuplicateInNewWindow: {

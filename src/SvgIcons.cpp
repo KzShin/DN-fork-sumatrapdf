@@ -134,6 +134,15 @@ static const char* gIconRotateRight =
   <circle cx="11" cy="19.94" r="0.15"/>
 </svg>)";
 
+// https://github.com/tabler/tabler-icons/blob/master/icons/photo.svg
+static const char* gIconCopyPageImage =
+    R"(<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="3" y="4" width="18" height="16" rx="3" />
+  <circle cx="9" cy="10" r="2" />
+  <path d="M21 15l-5-4l-3 3l-2-2l-4 4" />
+</svg>)";
+
 // must match order in enum class TbIcon
 // clang-format off
 static const char* gAllIcons[] = {
@@ -152,6 +161,7 @@ static const char* gAllIcons[] = {
     gIconSave,
     gIconRotateLeft,
     gIconRotateRight,
+    gIconCopyPageImage,
 };
 // clang-format on
 

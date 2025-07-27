@@ -81,6 +81,8 @@ static ToolbarButtonInfo gToolbarButtons[] = {
     {TbIcon::SearchPrev, CmdFindPrev, _TRN("Find Previous")},
     {TbIcon::SearchNext, CmdFindNext, _TRN("Find Next")},
     {TbIcon::MatchCase, CmdFindMatch, _TRN("Match Case")},
+    {TbIcon::None, 0, nullptr}, // separator
+    {TbIcon::CopyPageImage, CmdCopyPageImage, _TRN("Copy As Image")},
     {TbIcon::None, CmdInfoText, nullptr}, // info text
 };
 

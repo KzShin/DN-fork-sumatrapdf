@@ -17629,4 +17629,4 @@ tl:ipini-print ang dokumento
 tr:belge yazdırılıyor
 tw:正在列印文件
 uk:друк документа
-vn:đang in tập tin
+vn:đang in tập tin::Copy As Image
