@@ -136,6 +136,31 @@ int DisplayModel::GetPageByLabel(const char* label) const {
     return engine->GetPageByLabel(label);
 }
 
+int DisplayModel::LogicalPageCount() const {
+    if (!HasPageLabels()) {
+        return PageCount();
+    }
+    if (logicalPageCountCache > 0) {
+        return logicalPageCountCache;
+    }
+    int count = PageCount();
+    int maxVal = 0;
+    for (int i = 1; i <= count; i++) {
+        AutoFreeStr label(GetPageLabel(i));
+        int val = 0;
+        if (str::Parse(label, "%d%$", &val)) {
+            if (val > maxVal) {
+                maxVal = val;
+            }
+        }
+    }
+    if (maxVal <= 0) {
+        maxVal = count;
+    }
+    logicalPageCountCache = maxVal;
+    return maxVal;
+}
+
 // common shortcuts
 bool DisplayModel::ValidPageNo(int pageNo) const {
     if (!engine) {
