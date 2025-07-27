@@ -1168,6 +1168,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     UpdateGlobalPrefs(flags);
     SetCurrentLang(flags.lang ? flags.lang : gGlobalPrefs->uiLanguage);
 
+    if (!flags.inNewWindow && gGlobalPrefs->useTabs && IsShiftPressed()) {
+        flags.inNewWindow = true;
+    }
+
 #if defined(DEBUG)
     void TestBrowser(); // scratch.cpp
     if (flags.testBrowser) {
