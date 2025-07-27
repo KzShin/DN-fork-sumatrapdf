@@ -13,6 +13,11 @@
 #include "wingui/Layout.h"
 #include "wingui/WinGui.h"
 
+#include "DocController.h"
+#include "Annotation.h"
+#include "EngineBase.h"
+
+#include "Settings.h"
 #include "Theme.h"
 #include "WindowTab.h"
 
@@ -3453,7 +3458,8 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
     SolidBrush br(GdipCol(theme->window.controlBackgroundColor));
 
     //Font f(hdc, GetDefaultGuiFont());
-    Font f(&fontFamily, 9, Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
+    Font f(&fontFamily, 8, Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
+    Font f2(&fontFamily, 7, Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
 
     Gdiplus::Rect gr = ToGdipRect(rc);
     gfx.FillRectangle(&br, gr);
@@ -3531,7 +3537,7 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
         gfx.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
         rTxt = ToGdipRectF(ti->r);
         rTxt.X += 8;
-        rTxt.Width -= (8 + r.dx + 8);
+        rTxt.Width -= (8 + r.dx + 4);
 
         // prepare strings
         const char* fileTitle = ti->text;
@@ -3561,7 +3567,8 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
         WCHAR* wsFile = ToWstrTemp(fileTitle);
         gfx.DrawString(wsFile, -1, &f, rFile, &sfFile, &br);
         if (pageBuf[0]) {
-            gfx.DrawString(wsPage, -1, &f, rPage, &sfPage, &br);
+            br.SetColor(GdipCol(RGB(127,127,127)));
+            gfx.DrawString(wsPage, -1, &f2, rPage, &sfPage, &br);
         }
     }
 }
@@ -3600,7 +3607,7 @@ HBITMAP TabsCtrl::RenderForDragging(int idx) {
 
     Gdiplus::RectF rTxt(0, 0, ti->r.dx, ti->r.dy);
     rTxt.X += 8;
-    rTxt.Width -= (8 + 8);
+    rTxt.Width -= (8 + 8 + 12);
 
     const char* fileTitle = ti->text;
     WindowTab* wt = (WindowTab*)ti->userData;
@@ -3609,7 +3616,7 @@ HBITMAP TabsCtrl::RenderForDragging(int idx) {
         int curr = wt->ctrl->CurrentPageNo();
         int count = wt->ctrl->PageCount();
         if (count > 0) {
-            snprintf(pageBuf, sizeof(pageBuf), " (%d/%d)", curr, count);
+            snprintf(pageBuf, sizeof(pageBuf), " (%d/%d)   ", curr, count);
         }
     }
 
