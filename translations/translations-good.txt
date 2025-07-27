@@ -17630,3 +17630,11 @@ tr:belge yazdırılıyor
 tw:正在列印文件
 uk:друк документа
 vn:đang in tập tin::Copy As Image
+:Open In New Tab
+ja:新しいタブで開く
+:Copy As Image
+ja:画像としてコピー
+:First Page
+ja:先頭ページ
+:Last Page
+ja:最終ページ

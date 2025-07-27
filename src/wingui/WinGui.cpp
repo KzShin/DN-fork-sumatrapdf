@@ -3569,12 +3569,12 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
         Gdiplus::RectF rPage = rTxt;
         rPage.X += rFile.Width;
         rPage.Width = (float)pageSz.dx;
-
+        
         br.SetColor(GdipCol(textColor));
         WCHAR* wsFile = ToWstrTemp(fileTitle);
         gfx.DrawString(wsFile, -1, &f, rFile, &sfFile, &br);
         if (pageBuf[0]) {
-            br.SetColor(GdipCol(RGB(127,127,127)));
+            br.SetColor(GdipCol(RGB(77, 77, 77)));
             gfx.DrawString(wsPage, -1, &f2, rPage, &sfPage, &br);
         }
     }
