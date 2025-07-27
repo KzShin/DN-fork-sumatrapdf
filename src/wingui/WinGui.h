@@ -700,6 +700,14 @@ struct TabDraggedEvent {
 
 using TabDraggedHandler = std::function<void(TabDraggedEvent*)>;
 
+struct TabDblClickEvent {
+    TabsCtrl* tabs = nullptr;
+    int tabIdx = -1;
+    bool shiftPressed = false;
+};
+
+using TabDblClickHandler = std::function<void(TabDblClickEvent*)>;
+
 struct TabsCreateArgs {
     HWND parent = nullptr;
     HFONT font = nullptr;
@@ -748,6 +756,7 @@ struct TabsCtrl : Wnd {
     TabsSelectionChangedHandler onSelectionChanged = nullptr;
     TabMigrationHandler onTabMigration = nullptr;
     TabDraggedHandler onTabDragged = nullptr;
+    TabDblClickHandler onTabDblClick = nullptr;
 
     COLORREF currBgCol = 0;
     COLORREF tabBackgroundBg = 0;
