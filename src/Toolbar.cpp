@@ -71,6 +71,9 @@ static ToolbarButtonInfo gToolbarButtons[] = {
     {TbIcon::PagePrev, CmdGoToPrevPage, _TRN("Previous Page")},
     {TbIcon::PageNext, CmdGoToNextPage, _TRN("Next Page")},
     {TbIcon::None, 0, nullptr}, // separator
+    {TbIcon::PageFirst, CmdGoToFirstPage, _TRN("First Page")},
+    {TbIcon::PageLast, CmdGoToLastPage, _TRN("Last Page")},
+    {TbIcon::None, 0, nullptr}, // separator
     {TbIcon::LayoutContinuous, CmdZoomFitWidthAndContinuous, _TRN("Fit Width and Show Pages Continuously")},
     {TbIcon::LayoutSinglePage, CmdZoomFitPageAndSinglePage, _TRN("Fit a Single Page")},
     {TbIcon::RotateLeft, CmdRotateLeft, _TRN("Rotate &Left")},
@@ -174,6 +177,10 @@ static bool IsToolbarButtonEnabled(MainWindow* win, int buttonNo) {
             return win->ctrl->CurrentPageNo() < win->ctrl->PageCount();
         case CmdGoToPrevPage:
             return win->ctrl->CurrentPageNo() > 1;
+        case CmdGoToFirstPage:
+            return win->ctrl->CurrentPageNo() > 1;
+        case CmdGoToLastPage:
+            return win->ctrl->CurrentPageNo() < win->ctrl->PageCount();
 
         default:
             return true;

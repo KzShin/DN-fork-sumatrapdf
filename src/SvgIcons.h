@@ -22,4 +22,6 @@ enum class TbIcon {
     RotateLeft,
     RotateRight,
     CopyPageImage,
+    PageFirst,
+    PageLast,
 };
