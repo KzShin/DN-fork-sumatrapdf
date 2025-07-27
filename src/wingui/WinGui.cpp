@@ -3546,6 +3546,13 @@ void TabsCtrl::Paint(HDC hdc, RECT& rc) {
         if (wt && wt->IsDocLoaded()) {
             int curr = wt->ctrl->CurrentPageNo();
             int count = wt->ctrl->PageCount();
+            if (wt->ctrl->HasPageLabels()) {
+                AutoFreeStr label(wt->ctrl->GetPageLabel(curr));
+                int logicalCurr = curr;
+                str::Parse(label, "%d%$", &logicalCurr);
+                curr = logicalCurr;
+                count = wt->ctrl->LogicalPageCount();
+            }
             if (count > 0) {
                 snprintf(pageBuf, sizeof(pageBuf), " (%d/%d)", curr, count);
             }
@@ -3615,6 +3622,13 @@ HBITMAP TabsCtrl::RenderForDragging(int idx) {
     if (wt && wt->IsDocLoaded()) {
         int curr = wt->ctrl->CurrentPageNo();
         int count = wt->ctrl->PageCount();
+        if (wt->ctrl->HasPageLabels()) {
+            AutoFreeStr label(wt->ctrl->GetPageLabel(curr));
+            int logicalCurr = curr;
+            str::Parse(label, "%d%$", &logicalCurr);
+            curr = logicalCurr;
+            count = wt->ctrl->LogicalPageCount();
+        }
         if (count > 0) {
             snprintf(pageBuf, sizeof(pageBuf), " (%d/%d)   ", curr, count);
         }

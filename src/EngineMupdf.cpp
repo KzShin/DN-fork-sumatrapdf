@@ -3380,7 +3380,12 @@ int EngineMupdf::GetPageByLabel(const char* label) const {
     }
     int pageNo = 0;
     if (pageLabels) {
-        pageNo = pageLabels->Find(label) + 1;
+        for (int i = pageLabels->Size() - 1; i >= 0; i--) {
+            if (str::Eq(label, pageLabels->at(i))) {
+                pageNo = i + 1;
+                break;
+            }
+        }
     }
 
     if (!pageNo) {

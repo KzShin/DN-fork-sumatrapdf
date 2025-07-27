@@ -118,6 +118,9 @@ struct DocController {
     virtual int GetPageByLabel(const char* label) const {
         return atoi(label);
     }
+    virtual int LogicalPageCount() const {
+        return PageCount();
+    }
 
     // common shortcuts
     virtual bool ValidPageNo(int pageNo) const {

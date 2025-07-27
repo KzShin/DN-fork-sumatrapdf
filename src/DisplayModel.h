@@ -106,6 +106,7 @@ struct DisplayModel : DocController {
     bool HasPageLabels() const override;
     char* GetPageLabel(int pageNo) const override;
     int GetPageByLabel(const char* label) const override;
+    int LogicalPageCount() const override;
 
     // common shortcuts
     bool ValidPageNo(int pageNo) const override;
@@ -261,4 +262,6 @@ struct DisplayModel : DocController {
 
     /* allow resizing a window without triggering a new rendering (needed for window destruction) */
     bool dontRenderFlag = false;
+
+    mutable int logicalPageCountCache = 0;
 };

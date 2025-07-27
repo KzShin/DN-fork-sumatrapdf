@@ -651,8 +651,9 @@ void UpdateToolbarPageText(MainWindow* win, int pageCount, bool updateOnly) {
     } else if (!win->ctrl || !win->ctrl->HasPageLabels()) {
         buf = str::Format(" / %d", pageCount);
     } else {
-        buf = str::Format(" (%d / %d)", win->ctrl->CurrentPageNo(), pageCount);
-        AutoFreeStr buf2(str::Format(" (%d / %d)", pageCount, pageCount));
+        int logicalCount = win->ctrl->LogicalPageCount();
+        buf = str::Format(" / %d (%d / %d)", logicalCount, win->ctrl->CurrentPageNo(), pageCount);
+        AutoFreeStr buf2(str::Format(" / %d (%d / %d)", logicalCount, pageCount, pageCount));
         size2 = TextSizeInHwnd(win->hwndPageTotal, buf2);
     }
 

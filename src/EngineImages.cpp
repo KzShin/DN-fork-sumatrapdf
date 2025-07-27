@@ -879,7 +879,7 @@ char* EngineImageDir::GetPageLabel(int pageNo) const {
 
 int EngineImageDir::GetPageByLabel(const char* label) const {
     size_t nLabel = str::Len(label);
-    for (int i = 0; i < pageFileNames.Size(); i++) {
+    for (int i = pageFileNames.Size() - 1; i >= 0; i--) {
         char* pagePath = pageFileNames[i];
         const char* fileName = path::GetBaseNameTemp(pagePath);
         char* ext = path::GetExtTemp(fileName);

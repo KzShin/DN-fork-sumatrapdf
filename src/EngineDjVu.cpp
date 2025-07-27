@@ -1185,7 +1185,7 @@ char* EngineDjVu::GetPageLabel(int pageNo) const {
 }
 
 int EngineDjVu::GetPageByLabel(const char* label) const {
-    for (size_t i = 0; i < fileInfos.size(); i++) {
+    for (int i = (int)fileInfos.size() - 1; i >= 0; i--) {
         ddjvu_fileinfo_t& info = fileInfos.at(i);
         if (str::EqI(info.title, label) && !str::Eq(info.title, info.id)) {
             return info.pageno + 1;
