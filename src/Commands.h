@@ -27,6 +27,7 @@ Cmd* enum (e.g. CmdOpen) and a human-readable name (not used yet).
     V(CmdBookView, "Book View")                                           \
     V(CmdToggleContinuousView, "Toggle Continuous View")                  \
     V(CmdToggleMangaMode, "Toggle Manga Mode")                            \
+    V(CmdToggleHorizontalManga, "Horizontal Manga Mode")                  \
     V(CmdRotateLeft, "Rotate Left")                                       \
     V(CmdRotateRight, "Rotate Right")                                     \
     V(CmdToggleBookmarks, "Toggle Bookmarks")                             \

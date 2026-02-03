@@ -693,6 +693,101 @@ void DisplayModel::Relayout(float newZoomVirtual, int newRotation) {
     viewPort = Rect(viewPort.TL(), totalViewPortSize);
 
 RestartLayout:
+    // --- Horizontal Manga Mode (右から左へ, 高さ合わせ) ---
+    if (displayMode == DisplayMode::HorizontalManga) {
+        // 1. まず標準のズーム計算を呼ぶ（内部変数の更新のため）
+        CalcZoomReal(newZoomVirtual);
+
+        // 2. 有効な「仮想ズーム設定」を取得する
+        // (リサイズ時は newZoomVirtual が kInvalidZoom (-99) で来るため、保存されている設定値を参照する)
+        float vZoom = newZoomVirtual;
+        if (vZoom == kInvalidZoom) {
+            vZoom = this->zoomVirtual;
+        }
+
+        // 3. 高さ合わせを行うか判定
+        // vZoom がマイナスの値（Fit Page, Fit Width, Fit Content）なら自動モードとみなして高さを合わせる。
+        // ※ 100% などの固定倍率指定の場合は、vZoom が正の値になるため除外される。
+        bool fitHeight = (vZoom < 0);
+
+        // ウィンドウの描画可能高さ（マージン除く）
+        int availableHeight = viewPort.dy - windowMargin.top - windowMargin.bottom;
+        if (availableHeight < 10)
+            availableHeight = 10;
+
+        // 【ステップ1】全ページの配置計算用ループ（合計幅の算出）
+        int totalContentWidth = 0;
+        int maxDy = 0;
+
+        for (int pageNo = 1; pageNo <= PageCount(); ++pageNo) {
+            SizeF pageSize = PageSizeAfterRotation(pageNo);
+            float zoom;
+
+            if (fitHeight) {
+                // 高さ合わせ: ウィンドウの高さ / ページの高さ
+                zoom = (float)availableHeight / pageSize.dy;
+            } else {
+                // 固定ズーム: 設定値をそのまま使用
+                zoom = GetZoomReal(pageNo);
+            }
+
+            // ページの画面上でのサイズ
+            int dx = (int)(pageSize.dx * zoom + 0.499f);
+            int dy = (int)(pageSize.dy * zoom + 0.499f);
+
+            totalContentWidth += dx;
+            if (dy > maxDy)
+                maxDy = dy;
+        }
+
+        // ページ間の隙間を加算
+        if (PageCount() > 1) {
+            totalContentWidth += (PageCount() - 1) * pageSpacing.dx;
+        }
+
+        // キャンバス全体のサイズを確定
+        int canvasDx = windowMargin.left + totalContentWidth + windowMargin.right;
+        int canvasDy = windowMargin.top + maxDy + windowMargin.bottom;
+
+        // ウィンドウよりコンテンツが小さい場合でも、スクロールバーが出ないようにviewportサイズを下限にする
+        canvasSize = Size(std::max(canvasDx, viewPort.dx), std::max(canvasDy, viewPort.dy));
+
+        // 【ステップ2】配置の確定（右から左へ）
+        // 開始位置（X座標）をキャンバスの「右マージンの内側」に設定
+        int currEndPos = canvasDx - windowMargin.right;
+
+        for (int pageNo = 1; pageNo <= PageCount(); ++pageNo) {
+            PageInfo* pageInfo = GetPageInfo(pageNo);
+            if (!pageInfo || !pageInfo->shown)
+                continue;
+
+            SizeF pageSize = PageSizeAfterRotation(pageNo);
+            float zoom;
+
+            // ステップ1と同じロジックで再計算
+            if (fitHeight) {
+                zoom = (float)availableHeight / pageSize.dy;
+            } else {
+                zoom = GetZoomReal(pageNo);
+            }
+
+            pageInfo->pos.dx = (int)(pageSize.dx * zoom + 0.499f);
+            pageInfo->pos.dy = (int)(pageSize.dy * zoom + 0.499f);
+
+            // Y座標は中央揃えではなく「上端揃え」にします（隙間対策）
+            pageInfo->pos.y = windowMargin.top;
+
+            // 配置：現在の右端から「自分の幅」を引いた位置が、自分の左端(x)
+            pageInfo->pos.x = currEndPos - pageInfo->pos.dx;
+
+            // 次のページのために、終了位置を左へずらす
+            currEndPos -= (pageInfo->pos.dx + pageSpacing.dx);
+        }
+
+        return;
+    }
+    // --- 修正ここまで ---
+
     int currPosY = windowMargin.top;
     float currZoomReal = zoomReal;
     CalcZoomReal(newZoomVirtual);
@@ -909,6 +1004,18 @@ void DisplayModel::RecalcVisibleParts() const {
         return;
     }
 
+    // --- ★ここから追加：判定エリアの拡張ロジック ---
+    Rect checkRect = viewPort;
+    if (displayMode == DisplayMode::HorizontalManga) {
+        // 【変更点】バッファサイズを「画面幅の2倍」にする
+        // ※ メモリに余裕があれば * 3 でもOKですが、まずは * 2 がおすすめです。
+        int buffer = viewPort.dx * 2;
+
+        checkRect.x -= buffer;
+        checkRect.dx += buffer * 2;
+    }
+    // --- 追加ここまで ---
+
     for (int pageNo = 1; pageNo <= PageCount(); ++pageNo) {
         PageInfo* pageInfo = GetPageInfo(pageNo);
         if (!pageInfo->shown) {
@@ -917,7 +1024,9 @@ void DisplayModel::RecalcVisibleParts() const {
         }
 
         Rect pageRect = pageInfo->pos;
-        Rect visiblePart = pageRect.Intersect(viewPort);
+
+        // ★変更箇所： viewPort ではなく、広げた checkRect と判定させる
+        Rect visiblePart = pageRect.Intersect(checkRect);
 
         pageInfo->visibleRatio = 0.0;
         if (!visiblePart.IsEmpty()) {
@@ -1459,6 +1568,11 @@ void DisplayModel::ScrollXTo(int xOff) {
     int currPageNo = CurrentPageNo();
     viewPort.x = xOff;
     RecalcVisibleParts();
+
+    // ★★★ この1行を追加してください！ ★★★
+    RenderVisibleParts();
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★
+
     cb->UpdateScrollbars(canvasSize);
 
     if (CurrentPageNo() != currPageNo) {

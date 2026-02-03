@@ -234,6 +234,11 @@ static MenuDef menuDefView[] = {
         _TRN("Man&ga Mode"),
         CmdToggleMangaMode,
     },
+    // ‚±‚±‚É’Ç‹L
+    {
+        _TRN("Horizontal Manga Mode"),
+        CmdToggleHorizontalManga,
+    },
     {
         kMenuSeparator,
         0,
@@ -1490,6 +1495,11 @@ void MenuUpdateDisplayMode(MainWindow* win) {
 
     CheckMenuRadioItem(win->menu, CmdViewLayoutFirst, CmdViewLayoutLast, id, MF_BYCOMMAND);
     MenuSetChecked(win->menu, CmdToggleContinuousView, IsContinuous(displayMode));
+
+    // --- ‚±‚±‚©‚ç’Ç‹L ---
+    bool isHorizontalManga = (displayMode == DisplayMode::HorizontalManga);
+    MenuSetChecked(win->menu, CmdToggleHorizontalManga, isHorizontalManga);
+    // --------------------
 
     if (win->CurrentTab() && win->CurrentTab()->GetEngineType() == kindEngineComicBooks) {
         bool mangaMode = win->AsFixed()->GetDisplayR2L();

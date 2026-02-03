@@ -17638,3 +17638,7 @@ ja:画像としてコピー
 ja:先頭ページ
 :Last Page
 ja:最終ページ
+
+:Horizontal Manga Mode
+ja:横スクロール（左→右）
+

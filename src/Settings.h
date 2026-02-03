@@ -15,6 +15,8 @@ enum class DisplayMode {
     Continuous,
     ContinuousFacing,
     ContinuousBookView,
+    // 新しく追加
+    HorizontalManga,
 };
 
 constexpr float kZoomFitPage = -1.f;
@@ -68,6 +70,8 @@ struct FixedPageUI {
     bool invertColors;
     // if true, hides the scrollbars but retains ability to scroll
     bool hideScrollbars;
+    // 追記：横スクロール右綴じモードの有効フラグ
+    bool horizontalManga = false;
 };
 
 // customization options for Comic Book and images UI
@@ -470,10 +474,13 @@ static const FieldInfo gFixedPageUIFields[] = {
     {offsetof(FixedPageUI, gradientColors), SettingType::ColorArray, 0},
     {offsetof(FixedPageUI, invertColors), SettingType::Bool, false},
     {offsetof(FixedPageUI, hideScrollbars), SettingType::Bool, false},
+    // ここに追記：デフォルト値を false (0) として設定
+    {offsetof(FixedPageUI, horizontalManga), SettingType::Bool, false},
 };
-static const StructInfo gFixedPageUIInfo = {sizeof(FixedPageUI), 8, gFixedPageUIFields,
+// 修正後（項目数を 8 -> 9 に増やし、末尾に名前を追加）
+static const StructInfo gFixedPageUIInfo = {sizeof(FixedPageUI), 9, gFixedPageUIFields,
                                             "TextColor\0BackgroundColor\0SelectionColor\0WindowMargin\0PageSpacing\0Gra"
-                                            "dientColors\0InvertColors\0HideScrollbars"};
+                                            "dientColors\0InvertColors\0HideScrollbars\0HorizontalManga"};
 
 static const FieldInfo gWindowMargin_1_Fields[] = {
     {offsetof(WindowMargin, top), SettingType::Int, 0},

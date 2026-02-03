@@ -5464,6 +5464,51 @@ static LRESULT FrameOnCommand(MainWindow* win, HWND hwnd, UINT msg, WPARAM wp, L
             }
             break;
 
+        /* SumatraPDF.cpp */
+        case CmdToggleHorizontalManga: {
+            if (win && win->IsDocLoaded()) {
+                DisplayMode currentMode = win->ctrl->GetDisplayMode();
+                int pageNo = win->ctrl->CurrentPageNo(); // 現在のページ番号を保存
+
+                DisplayMode nextMode = (currentMode == DisplayMode::HorizontalManga) ? DisplayMode::ContinuousFacing
+                                                                                     : DisplayMode::HorizontalManga;
+
+                win->ctrl->SetDisplayMode(nextMode);
+                gGlobalPrefs->fixedPageUI.horizontalManga = (nextMode == DisplayMode::HorizontalManga);
+
+                // 1. レイアウトを再計算する（これでPageInfoの座標などが更新される）
+                win->UpdateCanvasSize();
+
+                // 2. Horizontal Manga Mode の場合、強制的にスクロール位置を合わせる
+                if (nextMode == DisplayMode::HorizontalManga) {
+                    // 固定レイアウト（PDF/画像等）のモデルを取得
+                    DisplayModel* dm = win->AsFixed();
+                    if (dm) {
+                        // ターゲットとなるページの情報を取得
+                        PageInfo* pi = dm->GetPageInfo(pageNo);
+                        if (pi) {
+                            // 「ページのX座標」と「現在の視点(viewPort)のX座標」の差を計算
+                            // viewPort.x は構造体のメンバ変数としてアクセス可能と仮定
+                            int targetX = pi->pos.x;
+                            int currentX = dm->viewPort.x;
+                            int deltaX = targetX - currentX;
+
+                            // 差分だけ強制スクロール（GoToPageの判定ロジックをバイパス）
+                            if (deltaX != 0) {
+                                dm->ScrollXBy(deltaX);
+                            }
+                        }
+                    }
+                } else {
+                    // 通常モードに戻る場合は、標準のGoToPageで十分
+                    win->ctrl->GoToPage(pageNo, true);
+                }
+
+                win->RedrawAll();
+            }
+            break;
+        }
+
 #if defined(DEBUG)
         case CmdDebugTestApp:
             extern void TestApp(HINSTANCE hInstance);

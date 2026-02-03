@@ -19,6 +19,7 @@ bool IsContinuous(DisplayMode mode) {
         case DisplayMode::Continuous:
         case DisplayMode::ContinuousFacing:
         case DisplayMode::ContinuousBookView:
+        case DisplayMode::HorizontalManga: // Å© Ç±ÇÍÇí«â¡ÅI
             return true;
     }
     return false;
@@ -56,7 +57,8 @@ static const char* displayModeNames =
     "book view\0"
     "continuous\0"
     "continuous facing\0"
-    "continuous book view\0";
+    "continuous book view\0"
+    "horizontal manga\0"; // Å© Ç±Ç±Ç…Ç±ÇÃèáî‘Ç≈í«â¡Ç≥ÇÍÇƒÇ¢ÇÈÇ±Ç∆Ç™ïKê{Ç≈Ç∑
 
 const char* DisplayModeToString(DisplayMode mode) {
     int idx = (int)mode;

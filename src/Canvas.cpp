@@ -1,4 +1,4 @@
-/* Copyright 2022 the SumatraPDF project authors (see AUTHORS file).
+﻿/* Copyright 2022 the SumatraPDF project authors (see AUTHORS file).
    License: GPLv3 */
 
 #include "utils/BaseUtil.h"
@@ -1210,6 +1210,46 @@ static LRESULT CanvasOnMouseWheel(MainWindow* win, UINT msg, WPARAM wp, LPARAM l
 
         return 0;
     }
+
+    // --- ここに追加 ---
+    // ズーム判定などの下に追加
+    if (win->ctrl && win->ctrl->GetDisplayMode() == DisplayMode::HorizontalManga) {
+        // --- 設定エリア (お好みで調整してください) ---
+        const int baseSpeed = 20; // 初速 (ピクセル)
+        const int maxSpeed = 2000; // 最高速度 (これ以上は速くならない)
+        const int accelStep = 20; // 1目盛り回すごとに増える速度
+        const int resetTime = 500; // この時間(ミリ秒)以上操作しなかったら速度リセット
+        // -------------------------------------------
+
+        // 状態を記憶するための静的変数
+        static DWORD lastTime = 0;
+        static int currentSpeed = baseSpeed;
+
+        DWORD now = GetTickCount(); // 現在時刻(ミリ秒)を取得
+
+        // 前回の操作から時間が経っていなければ加速
+        if (now - lastTime < resetTime) {
+            currentSpeed += accelStep;
+            if (currentSpeed > maxSpeed) {
+                currentSpeed = maxSpeed;
+            }
+        } else {
+            // 時間が空いたら初速にリセット
+            currentSpeed = baseSpeed;
+        }
+        lastTime = now;
+
+        // 方向の決定 (delta > 0 は右/前へ, delta < 0 は左/次へ)
+        int moveAmount = (delta > 0) ? currentSpeed : -currentSpeed;
+
+        DisplayModel* dm = win->AsFixed();
+        if (dm) {
+            dm->ScrollXBy(moveAmount);
+        }
+
+        return 0;
+    }
+    // -----------------
 
     // make sure to scroll whole pages in non-continuous Fit Content mode
     if (!IsContinuous(win->ctrl->GetDisplayMode()) && kZoomFitContent == win->ctrl->GetZoomVirtual()) {
